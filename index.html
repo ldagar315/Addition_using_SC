@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+          text-align: center;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+      
+        div {
+          width: 80%;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+        }
+      
+        button {
+          width: 20%;
+          align-self: center;
+          margin: 10px 0px 5px 0px;
+        }
+      </style>
+<title>MY First blockchain app</title>
+</head>
+<body>
+    <div>
+        <h1>This is a simple demonstration of blockchain addition and showcase</h1>
+        <p>You can send a value and see it log here</p>
+        <label for="mood">Input Mood:</label> <br />
+        <input type="text" id="mood" />
+        <button onclick="addOne()">Increase by 1  </button>
+        <button onclick="setNumber()">Set this number </button>
+        <button onclick="getNumber()">What was the number again ?</button>
+    </div>
+    <script
+    src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+    type="application/javascript"
+  ></script>
+  <script>
+     const AddContractAddress = "0x3970E00718cd215CE8972b2De8d1F74Ff48CB7ff";
+    const AddContractABI =[
+	{
+		"inputs": [],
+		"name": "addOne",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_first",
+				"type": "uint256"
+			}
+		],
+		"name": "setNumber",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getNumber",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+    let AddContract;
+    let signer;
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "ropsten");
+    provider.send("eth_requestAccounts",[]).then(() => {
+        provider.listAccounts().then(function (accounts) {
+            signer = provider.getSigner(accounts[0]);
+            AddContract = new ethers.Contract(
+                AddContractAddress,
+                AddContractABI,
+                signer
+            );
+        });
+    });
+    async function getNumber() {
+        const getNumberPromise = AddContract.getNumber();
+        const Num = await getNumberPromise;
+        console.log(Num);
+}
+
+    async function setNumber(){
+        const number = document.getElementById("mood").value;
+        const setNumberPromise = AddContract.setNumber(number);
+        const wait = await setNumberPromise;
+        console.log(wait);
+    }
+    async function addOne(){
+        const number = document.getElementById("mood").value;
+        const addNumberPromise = AddContract.addOne();
+        const wait = await addNumberPromise;
+        console.log(wait);
+    }
+  </script>
+</body>
+</html>
